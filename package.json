@@ -29,6 +29,7 @@
     "jsx-dom-factory": "^1.1.0",
     "jsx-transform": "^2.3.0",
     "moment": "^2.11.2",
+    "pubnub": "^3.14.5",
     "stopwords": "0.0.5",
     "underscore": "^1.8.3",
     "vinyl-buffer": "^1.0.0",

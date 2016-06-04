@@ -2,6 +2,7 @@
 // separate to all other pages. This script is responsible for hitting the
 // beacon API regularly to keep the user's session alive.
 
+
 var baseUri = "https://beacon.ses.nsw.gov.au/";
 var statusCheckInterval = 60 * 1000;
 var keepaliveInterval = 25 * 60 * 1000;
@@ -9,8 +10,6 @@ var lastActivity = null;
 
 var statusTimer = null;
 var keepaliveTimer = null;
-
-
 
 
 //block message js core requests
@@ -129,3 +128,13 @@ function hitApi(cb) {
   xhttp.open("GET", baseUri + "Api/v1/Jobs/1", true);
   xhttp.send();
 }
+
+
+
+
+
+
+
+
+
+

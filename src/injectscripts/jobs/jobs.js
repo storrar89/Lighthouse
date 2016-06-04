@@ -17,6 +17,10 @@ document.getElementById("lighthouseSummaryButton").onclick = function() {
   summary();
 }
 
+document.getElementById("lighthouseFunnel").onclick = function() {
+window.open(lighthouseUrl+"pages/publicrfa.html");
+}
+
 
 function summary() {
     var exports = JSON.parse(filterDataForExport());
