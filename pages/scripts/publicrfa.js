@@ -16,20 +16,9 @@ PUBNUB_demo.subscribe({
 	channel : 'NSWSESHackathon',
 	message : function(m){
 		console.log(m)
-		console.log(m.CallerFirstName)
-		console.log(m.CallerLastName)
-		console.log(m.CallerPhoneNumber)
-		console.log(m.Description)
-		console.log(m.Latitude)
-		console.log(m.Longitude)
-		console.log(m.StreetNumber)
-		console.log(m.Street)
-		console.log(m.Locality)
-		console.log(m.PostCode)
-		console.log(m.AdditionalAddressInfo)
-		console.log(m.ImageURL)
 
-		$('#content').append(make_public_submission(
+
+		var $html = make_public_submission(
 			m.job.CallerFirstName+" "+m.job.CallerLastName,
 			{
 				'Name': m.job.CallerFirstName+" "+m.job.CallerLastName,
@@ -38,9 +27,14 @@ PUBNUB_demo.subscribe({
 				'Contact': m.job.CallerPhoneNumber
 			},
 			m.job.Description
-			));
+			)
 
-
+		$($html).find('button').click(function() {
+			console.log(m.id);
+			localStorage.setItem('testObject', JSON.stringify(m));
+			window.open('https://trainbeacon.ses.nsw.gov.au/Jobs/Create','_blank'); 
+		});
+		$($html).appendTo('#content');
 	},
 	error : function (error) {
         // Handle error here
@@ -84,11 +78,11 @@ function make_public_submission(name, dataz, text) {
 		</tr>
 		<tr>
 		<td>Address:</td>
-		<td>{dataz.Address}</td>
+		<td>address</td>
 		</tr>
 		<tr>
 		<td>Additional Address:</td>
-		<td>{dataz.AddressAdditional}</td>
+		<td>more</td>
 		</tr>
 		<tr>
 		<td>Contact:</td>
@@ -106,10 +100,11 @@ function make_public_submission(name, dataz, text) {
 		</div>
 		</div>
 		<div class="panel-footer text-right">
-		<button type="button" class="btn btn-danger">Reject</button>
-		<button type="button" class="btn btn-success">Accept</button>
+		<div class="btn-toolbar">
+		<button type="button" class="btn btn-danger">Reject</button> 
+		<button type="button" class="btn btn-success">Accept</button> 
 		<button type="button" class="btn btn-primary">Request Further Info</button>
-
+		</div>
 		</div>
 		</div>
 		);
