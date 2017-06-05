@@ -1,3 +1,4 @@
+var $ = require('jquery');
 
 
 whenVmIsReady(function() {
@@ -5,44 +6,44 @@ whenVmIsReady(function() {
   var totalhrs = 0;
   vm.participants.peek().forEach(function(v){
    // console.log(v);
-    var start = new Date(v.StartDate)
-    var end = new Date(v.EndDate)
-    var diff = Math.abs(end - start) / 36e5;
-    totalhrs=totalhrs+diff
-  })
-console.log("Total Hrs:"+totalhrs)
+   var start = new Date(v.StartDate)
+   var end = new Date(v.EndDate)
+   var diff = Math.abs(end - start) / 36e5;
+   totalhrs=totalhrs+diff
+ })
+  console.log("Total Hrs:"+totalhrs)
 
-var hrDisplay = $('#content > div:nth-child(2) > div.col-xs-7 > div > div.widget-header > div:nth-child(2) > span')
+  var hrDisplay = $('#content > div:nth-child(2) > div.col-xs-7 > div > div.widget-header > div:nth-child(2) > span')
 
-var current = hrDisplay.text()
-totalhrs = totalhrs.toFixed(2)+""
-hrDisplay.append(" ("+totalhrs+" summed hrs)")
+  var current = hrDisplay.text()
+  totalhrs = totalhrs.toFixed(2)+""
+  hrDisplay.append(" ("+totalhrs+" summed hrs)")
 
 // Instance the tour
 require('bootstrap-tour')
 
-    var tour = new Tour({
-      name: "LHTourNITCView",
-      smartPlacement: true,
-      placement: "right",
-      steps: [
-      {
-        element: "",
-        placement: "top",
-        orphan: true,
-        backdrop: true,
-        title: "Lighthouse Welcome",
-        content: "Lighthouse has made some changes to this page. would you like a tour?"
-      },
-      {
-        element: hrDisplay,
-        title: "Lighthouse NITC Maths",
-        placement: "bottom",
-        backdrop: false,
-        content: "Lighthouse will count the hours per member and show the total for the event here",
-      }
-      ]
-    })
+var tour = new Tour({
+  name: "LHTourNITCView",
+  smartPlacement: true,
+  placement: "right",
+  steps: [
+  {
+    element: "",
+    placement: "top",
+    orphan: true,
+    backdrop: true,
+    title: "Lighthouse Welcome",
+    content: "Lighthouse has made some changes to this page. would you like a tour?"
+  },
+  {
+    element: hrDisplay,
+    title: "Lighthouse NITC Maths",
+    placement: "bottom",
+    backdrop: false,
+    content: "Lighthouse will count the hours per member and show the total for the event here",
+  }
+  ]
+})
 
     /// Initialize the tour
     tour.init();
@@ -67,6 +68,4 @@ function whenVmIsReady(cb) { //when external vars have loaded
     }
   }, 400);
 }
-
-
 

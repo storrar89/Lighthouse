@@ -112,9 +112,16 @@
       ],
       "exclude_matches": [
         "https://*.ses.nsw.gov.au/nitc",
-        "https://*.ses.nsw.gov.au/nitc/"
+        "https://*.ses.nsw.gov.au/nitc/",
+        "https://*.ses.nsw.gov.au/nitc/*/*"
       ],
       "js": ["contentscripts/nitc/view.js"]
+    },
+    {
+      "matches": [
+        "https://*.ses.nsw.gov.au/nitc/*/Edit"
+      ],
+      "js": ["contentscripts/nitc/edit.js"]
     },
     {
       "matches": [
