@@ -13,7 +13,7 @@ chrome.manifest = (function() {
     try {
         xhr.send();
     } catch(e) {
-        console.log('Couldn\'t load manifest.json');
+        console.log('Couldn\'t load manifest.json: ' + e);
     }
 
     return manifestObject;
