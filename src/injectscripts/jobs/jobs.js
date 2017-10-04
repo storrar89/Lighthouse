@@ -80,6 +80,266 @@ function advexport() {
 //   contentViewModel.selectedPageSizeChoice(saved);
 // }
 
+var query = window.location.search.substring(1);
+var qs = parse_query_string(query);
+var filterApplied = false
+
+$.each( qs, function( key, value ) {  
+  switch (key)
+  {
+    case "Tags":
+    filterApplied = true
+    filterViewModel.selectedTags.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      filterViewModel.selectedTags.push({Id:itm})
+    })
+    break
+    case "RescueTypes":
+    filterApplied = true
+    filterViewModel.selectedRescueTypes.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      filterViewModel.selectedRescueTypes.push({Id:itm})
+    })
+    break
+    case "FloodAssTypes":
+    filterApplied = true
+    filterViewModel.selectedFloodAssTypes.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      filterViewModel.selectedFloodAssTypes.push({Id:itm})
+    })
+    break
+    case "PriorityTypes":
+    filterApplied = true
+    filterViewModel.selectedPriorityTypes.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      filterViewModel.selectedPriorityTypes.push({Id:itm})
+    })
+    break
+    case "StatusTypes":
+    filterApplied = true
+    filterViewModel.selectedStatusTypes.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      filterViewModel.selectedStatusTypes.push({Id:itm})
+    })
+    break
+    case "ParentJobTypes":
+    filterApplied = true
+    filterViewModel.selectedParentJobTypes.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      filterViewModel.selectedParentJobTypes.push({Id:itm})
+    })
+    break
+    case "dateRangeType":
+    filterApplied = true
+    switch (value)
+    {
+      case "Today":
+      filterViewModel.startDate(utility.dateRanges.Today.StartDate())
+      filterViewModel.endDate(utility.dateRanges.Today.EndDate())
+      filterViewModel.dateRangeType('Today')
+      $("#reportrange").data().daterangepicker.startDate = utility.dateRanges.Today.StartDate()
+      $("#reportrange").data().daterangepicker.endDate = utility.dateRanges.Today.EndDate()
+      $("#reportrange span").html(utility.dateRanges.Today.StartDate().format("MMMM D, YYYY H:mm") + " - " + utility.dateRanges.Today.EndDate().format("MMMM D, YYYY H:mm"));
+      break
+      case "Yesterday":
+      filterViewModel.startDate(utility.dateRanges.Yesterday.StartDate())
+      filterViewModel.endDate(utility.dateRanges.Yesterday.EndDate())
+      filterViewModel.dateRangeType('Yesterday')
+      $("#reportrange").data().daterangepicker.startDate = utility.dateRanges.Yesterday.StartDate()
+      $("#reportrange").data().daterangepicker.endDate = utility.dateRanges.Yesterday.EndDate()
+      $("#reportrange span").html(utility.dateRanges.Yesterday.StartDate().format("MMMM D, YYYY H:mm") + " - " + utility.dateRanges.Yesterday.EndDate().format("MMMM D, YYYY H:mm"));
+      break
+      case "Last 7 Days":
+      filterViewModel.startDate(utility.dateRanges.Last7Days.StartDate())
+      filterViewModel.endDate(utility.dateRanges.Last7Days.EndDate())
+      filterViewModel.dateRangeType('Last 7 Days')
+      $("#reportrange").data().daterangepicker.startDate = utility.dateRanges.Last7Days.StartDate()
+      $("#reportrange").data().daterangepicker.endDate = utility.dateRanges.Last7Days.EndDate()
+      $("#reportrange span").html(utility.dateRanges.Last7Days.StartDate().format("MMMM D, YYYY H:mm") + " - " + utility.dateRanges.Last7Days.EndDate().format("MMMM D, YYYY H:mm"));
+      break
+      case "Last 30 Days":
+      filterViewModel.startDate(utility.dateRanges.Last30Days.StartDate())
+      filterViewModel.endDate(utility.dateRanges.Last30Days.EndDate())
+      filterViewModel.dateRangeType('Last 30 Days')
+      $("#reportrange").data().daterangepicker.startDate = utility.dateRanges.Last30Days.StartDate()
+      $("#reportrange").data().daterangepicker.endDate = utility.dateRanges.Last30Days.EndDate()
+      $("#reportrange span").html(utility.dateRanges.Last30Days.StartDate().format("MMMM D, YYYY H:mm") + " - " + utility.dateRanges.Last30Days.EndDate().format("MMMM D, YYYY H:mm"));
+      break
+      case "This Month":
+      filterViewModel.startDate(utility.dateRanges.ThisMonth.StartDate())
+      filterViewModel.endDate(utility.dateRanges.ThisMonth.EndDate())
+      filterViewModel.dateRangeType('This Month')
+      $("#reportrange").data().daterangepicker.startDate = utility.dateRanges.ThisMonth.StartDate()
+      $("#reportrange").data().daterangepicker.endDate = utility.dateRanges.ThisMonth.EndDate()
+      $("#reportrange span").html(utility.dateRanges.ThisMonth.StartDate().format("MMMM D, YYYY H:mm") + " - " + utility.dateRanges.ThisMonth.EndDate().format("MMMM D, YYYY H:mm"));
+      break
+      case "Last Month":
+      filterViewModel.startDate(utility.dateRanges.LastMonth.StartDate())
+      filterViewModel.endDate(utility.dateRanges.LastMonth.EndDate())
+      filterViewModel.dateRangeType('Last Month')
+      $("#reportrange").data().daterangepicker.startDate = utility.dateRanges.LastMonth.StartDate()
+      $("#reportrange").data().daterangepicker.endDate = utility.dateRanges.LastMonth.EndDate()
+      $("#reportrange span").html(utility.dateRanges.LastMonth.StartDate().format("MMMM D, YYYY H:mm") + " - " + utility.dateRanges.LastMonth.EndDate().format("MMMM D, YYYY H:mm"));
+      break
+      case "This Calendar Year":
+      filterViewModel.startDate(moment().startOf('year'))
+      filterViewModel.endDate(moment().endOf('year'))
+      filterViewModel.dateRangeType('This Calendar Year')
+      $("#reportrange").data().daterangepicker.startDate = moment().startOf('year')
+      $("#reportrange").data().daterangepicker.endDate = moment().endOf('year')
+      $("#reportrange span").html(moment().startOf('year').format("MMMM D, YYYY H:mm") + " - " + moment().endOf('year').format("MMMM D, YYYY H:mm"));
+      break
+      case "All":
+      filterViewModel.startDate(utility.minDate)
+      filterViewModel.endDate(moment().endOf('year'))
+      filterViewModel.dateRangeType('All')
+      $("#reportrange").data().daterangepicker.startDate = utility.minDate
+      $("#reportrange").data().daterangepicker.endDate = moment().endOf('year')
+      $("#reportrange span").html(utility.minDate.format("MMMM D, YYYY H:mm") + " - " + moment().endOf('year').format("MMMM D, YYYY H:mm"));
+      break
+      case "Custom Range":
+      var start = moment(qs.startDate)
+      var end = moment(qs.endDate)
+      filterViewModel.startDate(start)
+      filterViewModel.endDate(end)
+      filterViewModel.dateRangeType('Custom Range')
+      $("#reportrange").data().daterangepicker.startDate = start
+      $("#reportrange").data().daterangepicker.endDate = end
+      $("#reportrange span").html(start.format("MMMM D, YYYY H:mm") + " - " + end.format("MMMM D, YYYY H:mm"));
+      break
+    }
+    break
+    case "Events":
+    filterApplied = true
+    filterViewModel.selectedEvents.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      filterViewModel.selectedEvents.push({Id:itm})
+    })
+    break
+    case "IInIds":
+    filterApplied = true
+    filterViewModel.icemsIInIds.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      $.ajax({
+        type: 'GET',
+        url: urls.Base+'/Api/v1/Jobs/Search?ICEMSIncidentIdentifier=' + itm + '&PageSize=1',
+        beforeSend: function(n) {
+          n.setRequestHeader("Authorization", "Bearer " + user.accessToken)
+        },
+        data: {
+          LighthouseFunction: 'LighthouseLoadICEMSFromURL'
+        },
+        cache: false,
+        dataType: 'json',
+        complete: function(response, textStatus) {
+          if (textStatus == 'success') {
+            if (response.responseJSON.Results.length)
+            {
+              filterViewModel.icemsIInIds.push(response.responseJSON.Results[0])
+            }
+          }
+        }
+      })
+    })
+    break
+    case "Teams":
+    filterApplied = true
+    filterViewModel.selectedTeams.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      whenBaseIsReady(function() {
+
+        $.ajax({
+          type: 'GET',
+          url: urls.Base+'/Api/v1/Teams/' + itm + '?viewModelType=3',
+          beforeSend: function(n) {
+            n.setRequestHeader("Authorization", "Bearer " + user.accessToken)
+          },
+          data: {
+            LighthouseFunction: 'LighthouseLoadTeamsFromURL'
+          },
+          cache: false,
+          dataType: 'json',
+          complete: function(response, textStatus) {
+            if (textStatus == 'success') {
+              if (response.responseJSON)
+              {
+                filterViewModel.selectedTeams.push({Id:response.responseJSON.Id,Callsign:response.responseJSON.Callsign})
+              }
+            }
+          }
+        })
+      })
+    })    
+    break
+    case "Entities":
+    filterApplied = true
+    filterViewModel.selectedEntities.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      filterViewModel.selectedEntities.push({Id:itm})
+    })
+    break
+    case "People":
+    filterApplied = true
+    filterViewModel.selectedPeople.removeAll()
+    var ids = JSON.parse(value);
+    ids.forEach(function(itm) {
+      filterViewModel.selectedPeople.push({Id:itm})
+    })
+    break
+  }
+  console.log(key)
+  console.log(value)
+})
+
+if (filterApplied)
+{
+  filterViewModel.updateFilters();
+}
+
+function parse_query_string(query) {
+  var vars = query.split("&");
+  var query_string = {};
+  for (var i = 0; i < vars.length; i++) {
+    var pair = vars[i].split("=");
+    // If first entry with this name
+    if (typeof query_string[pair[0]] === "undefined") {
+      query_string[pair[0]] = decodeURIComponent(pair[1]);
+      // If second entry with this name
+    } else if (typeof query_string[pair[0]] === "string") {
+      var arr = [query_string[pair[0]], decodeURIComponent(pair[1])];
+      query_string[pair[0]] = arr;
+      // If third or later entry with this name
+    } else {
+      query_string[pair[0]].push(decodeURIComponent(pair[1]));
+    }
+  }
+  return query_string;
+}
+
+// wait for address to have loaded
+function whenBaseIsReady(cb) { //when external vars have loaded
+  var waiting = setInterval(function() { //run every 1sec until we have loaded the page (dont hate me Sam)
+    if (typeof urls != "undefined" )
+    {
+      if (typeof urls.Base !== "undefined") {
+        console.log(urls.Base)
+        console.log("base is ready");
+      clearInterval(waiting); //stop timer
+      cb(); //call back
+    }
+  }
+}, 200);
+}
 
 DoTour()
 
