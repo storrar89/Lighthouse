@@ -100,6 +100,7 @@ function getTeamGeoJson(hqs, host, startDate, endDate, token, callback) {
                     GetTaskingfromBeacon(team.Id, host, token, function (teamTasking) {
                         let latestTasking = null;
                         let latestTime = null;
+                        let taskingList = [];
 
                         // Find the latest tasking
                         teamTasking.Results.forEach(function (task) {
@@ -111,49 +112,39 @@ function getTeamGeoJson(hqs, host, startDate, endDate, token, callback) {
                                     // Filter any tasking outside the start / end date range
                                     return;
                                 }
-                            } else { //viewing "current" which means finalised are hidden
-                                if (task.Job.JobStatusType.Name == "Complete" || task.Job.JobStatusType.Name == "Finalised" || task.Job.JobStatusType.Name == "Cancelled" || task.Job.JobStatusType.Name == "Rejected") {
+                            } else {
+                                //viewing "current" which means finalised are hidden
+                                if (task.Job.JobStatusType.Name === "Complete" ||
+                                    task.Job.JobStatusType.Name === "Finalised" ||
+                                    task.Job.JobStatusType.Name === "Cancelled" ||
+                                    task.Job.JobStatusType.Name === "Rejected") {
                                     return;
                                 }
                             }
 
                             // it wasn't an un-task or a tasking (so its a action the team made like on route or onsite)
                             if (latestTime < taskTime && task.CurrentStatus !== "Tasked" && task.CurrentStatus !== "Untasked") {
+                                if (latestTasking) {
+                                    taskingList.push(latestTasking);
+                                }
                                 latestTasking = task;
                                 latestTime = taskTime;
+                            } else {
+                                taskingList.push(task);
                             }
                         });
 
+                        let features = [];
+
                         // If valid tasking was found, add that into a geoJson feature
                         if (latestTasking !== null) {
-                            let feature = {
-                                'type': 'Feature',
-                                'geometry': {
-                                    'type': 'Point',
-                                    'coordinates': [
-                                        latestTasking.Job.Address.Longitude,
-                                        latestTasking.Job.Address.Latitude
-                                    ]
-                                },
-                                'properties': {
-                                    'teamId': latestTasking.Team.Id,
-                                    'teamCallsign': latestTasking.Team.Callsign,
-                                    'onsite': latestTasking.Onsite,
-                                    'offsite': latestTasking.Offsite,
-                                    'currentStatusTime': latestTasking.CurrentStatusTime,
-                                    'jobId': latestTasking.Job.Id,
-                                }
-                            };
-
-                            if (latestTasking.PrimaryTaskType) {
-                                feature.properties.primaryTask = latestTasking.PrimaryTaskType.Name;
-                            }
-
-                            resolve(feature);
+                            let feature = taskToGeoJson(latestTasking, 'latest-update');
+                            features.push(feature);
                         }
 
-                        // No relevant tasking for this team
-                        resolve(null);
+                        taskingList.forEach(task => features.push(taskToGeoJson(task)));
+
+                        resolve(features);
                     });
                 }));
             });
@@ -164,7 +155,7 @@ function getTeamGeoJson(hqs, host, startDate, endDate, token, callback) {
         }).then((promises) => {
 
             // Wait for all the team tasking promises to complete
-            Promise.all(promises).then(function (features) {
+            Promise.all(promises).then(function (featureLists) {
 
                 let geoJson = {
                     'type': 'FeatureCollection',
@@ -172,9 +163,9 @@ function getTeamGeoJson(hqs, host, startDate, endDate, token, callback) {
                 };
 
                 // Collect all non-null features
-                features.forEach(function (feature) {
-                    if (feature) {
-                        geoJson.features.push(feature);
+                featureLists.forEach(function (features) {
+                    if (features) {
+                        geoJson.features = geoJson.features.concat(features);
                     }
                 });
 
@@ -186,6 +177,41 @@ function getTeamGeoJson(hqs, host, startDate, endDate, token, callback) {
             });
         });
     }, statusTypes);
+}
+
+/**
+ * Converts team tasking to a geoJson point.
+ *
+ * @param task the task to convert.
+ * @param featureType the type of feature, e.g. 'pending', 'latest-update'.
+ * @returns a point.
+ */
+function taskToGeoJson(task, featureType = 'pending') {
+    let feature = {
+        'type': 'Feature',
+        'geometry': {
+            'type': 'Point',
+            'coordinates': [
+                task.Job.Address.Longitude,
+                task.Job.Address.Latitude
+            ]
+        },
+        'properties': {
+            'teamId': task.Team.Id,
+            'teamCallsign': task.Team.Callsign,
+            'onsite': task.Onsite,
+            'offsite': task.Offsite,
+            'currentStatusTime': task.CurrentStatusTime,
+            'jobId': task.Job.Id,
+            'featureType': featureType
+        }
+    };
+
+    if (task.PrimaryTaskType) {
+        feature.properties.primaryTask = task.PrimaryTaskType.Name;
+    }
+
+    return feature;
 }
 
 module.exports = {
