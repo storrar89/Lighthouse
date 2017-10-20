@@ -128,6 +128,7 @@ const developmentMode = lighthouseEnviroment === 'Development';
 const lighthouseIcon = lighthouseUrl + 'icons/lh-black.png';
 const powerIcon = lighthouseUrl + 'icons/power.png';
 const helicopterLastKnownIcon = lighthouseUrl + 'icons/helicopter-last-known.png';
+const teamTaskedIcon = lighthouseUrl + 'icons/tasked.png';
 const teamEnrouteIcon = lighthouseUrl + 'icons/enroute.png';
 const teamOnsiteIcon = lighthouseUrl + 'icons/bus.png';
 const teamOffsiteIcon = lighthouseUrl + 'icons/offsite.png';
@@ -453,15 +454,19 @@ const rfsIcons = {
                 let jobId = team.properties.jobId;
                 let name = team.properties.teamCallsign;
 
-                let teamIcon = teamEnrouteIcon;
-                let status = 'Enroute';
-                if (team.properties.onsite) {
-                    teamIcon = teamOnsiteIcon;
-                    status = 'On-site';
-                }
-                if (team.properties.offsite) {
-                    teamIcon = teamOffsiteIcon;
-                    status = 'Off-site';
+                let teamIcon = teamTaskedIcon;
+                let status = 'Tasked';
+                if (team.properties.featureType === 'latest-update') {
+                    teamIcon = teamEnrouteIcon;
+                    status = 'Enroute';
+                    if (team.properties.onsite) {
+                        teamIcon = teamOnsiteIcon;
+                        status = 'On-site';
+                    }
+                    if (team.properties.offsite) {
+                        teamIcon = teamOffsiteIcon;
+                        status = 'Off-site';
+                    }
                 }
 
                 let details =
