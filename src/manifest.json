@@ -26,6 +26,7 @@
     "https://api.transport.nsw.gov.au/*",
     "https://www.ausgrid.com.au/*",
     "http://www.endeavourenergy.com.au/*",
+    "http://www.bom.gov.au/*",
     "webRequest",
     "webRequestBlocking"
   ],

@@ -54,6 +54,8 @@ window.addEventListener("message", function(event) {
                 showSesTeamsLocations(mapLayer, event.data.response)
             } else if (event.data.layer === 'lhqs') {
                 showLhqs(mapLayer, event.data.response)
+            }  else if (event.data.layer === 'bom-weather-stations') {
+                showBomWeatherStations(mapLayer, event.data.response)
             } else if (event.data.layer === 'power-outages') {
                 showPowerOutages(mapLayer, event.data.response)
             }
@@ -131,6 +133,7 @@ const helicopterLastKnownIcon = lighthouseUrl + 'icons/helicopter-last-known.png
 const teamEnrouteIcon = lighthouseUrl + 'icons/enroute.png';
 const teamOnsiteIcon = lighthouseUrl + 'icons/bus.png';
 const teamOffsiteIcon = lighthouseUrl + 'icons/offsite.png';
+const bomIcon = lighthouseUrl + 'icons/bom.png';
 
 // A map of RFS categories to icons
 const rfsIcons = {
@@ -360,6 +363,48 @@ const rfsIcons = {
         }
     }
     console.info(`added ${count} SES LHQs`);
+}
+
+/**
+ * Show BOM weather stations on the map.
+ *
+ * @param mapLayer the map layer to add to.
+ * @param data the data to add to the layer.
+ */
+ function showBomWeatherStations(mapLayer, data) {
+    console.info('showing BOM weather stations');
+
+    if (data && data.features) {
+        for (let i = 0; i < data.features.length; i++) {
+            let station = data.features[i];
+
+            if (station.geometry.type.toLowerCase() === 'point') {
+                let lat = station.geometry.coordinates[1];
+                let lon = station.geometry.coordinates[0];
+                let name = station.properties.title;
+
+                // TODO:
+                //station.properties.lastUpdate;
+
+                let details =
+                    `<div>\
+                <div><a target='_blank' href="${station.properties.url}">${station.properties.title}</a> - ${station.properties.name} (${station.properties.id})</div>\
+                <div>Wind</div>\
+                <div>KM/H: ${station.properties.windSpeedKmh} ${station.properties.windDirection} gusting to: ${station.properties.windGustKmh} kmh</div>\
+                <div>Kts: ${station.properties.windSpeedKt} ${station.properties.windDirection} gusting to: ${station.properties.windGustKt} Kts</div>\
+                <div>Rain</div>\
+                <div>Rain since 9am: ${station.properties.rainSince9am}</div>\
+                <div>Cloud: ${station.properties.cloud}. Base meters: ${station.properties.cloudBaseM}</div>\
+                <div>Temperature</div>\
+                <div>Air temperature: ${station.properties.airTemp}</div>\
+                <div>Apparent temp: ${station.properties.apparentTemp}</div>\
+                <div>Delta: ${station.properties.deltaTemp}</div>\
+                </div>`;
+
+                mapLayer.addImageMarker(lat, lon, bomIcon, name, details);
+            }
+        }
+    }
 }
 
 /**
@@ -1202,6 +1247,7 @@ const SimpleLineSymbol = eval('require("esri/symbols/SimpleLineSymbol");');
         lighthouseMap.createLayer('power-outages', 1);
         lighthouseMap.createLayer('rfs', 1);
         lighthouseMap.createLayer('lhqs', 3);
+        lighthouseMap.createLayer('bom-weather-stations', 3);
 
         //bind to the click event for the jobs and fiddle with the popups Onclick
         lighthouseMap._map._layers.graphicsLayer3.onClick.after.advice = function (event) {
@@ -1365,7 +1411,10 @@ if (developmentMode) {
         }
         window['lighthouseMap'] = lighthouseMap;
 
-        let buttons = ['toggleRfsIncidentsBtn', 'toggleRmsIncidentsBtn', 'toggleRmsFloodingBtn', 'toggleRmsCamerasBtn', 'toggleSesTeamsBtn', 'toggleHelicoptersBtn', 'togglelhqsBtn', 'togglePowerOutagesBtn'];
+        let buttons = [
+            'toggleRfsIncidentsBtn', 'toggleRmsIncidentsBtn', 'toggleRmsFloodingBtn', 'toggleRmsCamerasBtn',
+            'toggleSesTeamsBtn', 'toggleHelicoptersBtn', 'togglelhqsBtn', 'togglePowerOutagesBtn',
+            'toggleBomStationsBtn'];
         buttons.forEach(function (buttonId) {
             if (localStorage.getItem('Lighthouse-' + buttonId) === 'true') {
                 let button = $(`#${buttonId}`);

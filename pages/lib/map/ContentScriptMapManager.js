@@ -12,15 +12,16 @@ const rmsIcon = chrome.extension.getURL('icons/rms.png');
 const rfscorpIcon = chrome.extension.getURL('icons/rfs.png');
 const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
 
+const bomIcon = chrome.extension.getURL('icons/bom.png');
 /**
  * A class for helping out with map layer access on the content script side.
  */
- module.exports = class ContentScriptMapManager {
+module.exports = class ContentScriptMapManager {
 
     /**
      * Constructs a new map manager.
      */
-     constructor() {
+    constructor() {
         // The map of timers which will update the lighthouse map layers when enabled
         this._timers = {};
     }
@@ -103,25 +104,30 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
             <img style="max-width: 16px; background: #fff;vertical-align: top;margin-right: 4px;" src={helicopterIcon} />
             <span class="tag-text">Rescue Aircraft</span>
             </span>
-            <span id="togglePowerOutagesBtn" class="label tag tag-lh-filter tag-disabled">
+                            <span id="togglePowerOutagesBtn" class="label tag tag-lh-filter tag-disabled">
             <span class="glyphicon glyphicon-flash" aria-hidden="true"></span>
             <span class="tag-text">Power Outages</span>
             </span>
-            </li>
+                            <span id="toggleBomStationsBtn" class="label tag tag-lh-filter tag-disabled">
+            <img style="max-width: 16px; background: #fff;vertical-align: top;margin-right: 4px;" src={bomIcon} />
+            <span class="tag-text">BOM Weather Stations</span>
+            </span>
+                        </li>
+                    </ul>
+                </li>
             </ul>
-            </li>
-            </ul>
-            </li>);
-}
+        </li>);
+    }
 
     /**
      * Initialises the map manager.
      */
-     initialise() {
+    initialise() {
         this._registerClickHandler('toggleRfsIncidentsBtn', 'rfs', this._requestRfsLayerUpdate, 5 * 60000); // every 5 mins
         this._registerClickHandler('toggleRmsIncidentsBtn', 'transport-incidents', this._requestTransportIncidentsLayerUpdate, 5 * 60000); // every 5 mins
         this._registerClickHandler('toggleRmsFloodingBtn', 'transport-flood-reports', this._requestTransportFloodReportsLayerUpdate, 5 * 60000); // every 5 mins
         this._registerClickHandler('toggleRmsCamerasBtn', 'transport-cameras', this._requestTransportCamerasLayerUpdate, 10 * 60000); // every 10 mins
+        this._registerClickHandler('toggleBomStationsBtn', 'bom-weather-stations', this._showBomStationsLayer, 10 * 60000); // every 10 mins
         this._registerClickHandler('toggleHelicoptersBtn', 'helicopters', ContentScriptMapManager._requestHelicoptersLayerUpdate, 10000); // every 10s
         this._registerClickHandler('toggleSesTeamsBtn', 'ses-teams', this._requestSesTeamsLayerUpdate, 5 * 60000); // every 5 minutes
         this._registerClickHandler('togglePowerOutagesBtn', 'power-outages', this._requestPowerOutagesLayerUpdate, 5 * 60000); // every 5 mins
@@ -151,26 +157,26 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
 
                     var disabled = $('#toggleSesTeamsBtn').hasClass('tag-disabled');
                     if (!disabled) //if the teams button is pressed, teams are shown, update them with the new data
-                     {
+                    {
                         this._requestSesTeamsLayerUpdate()
-                     }
+                    }
 
-    } else if (event.data.type === 'LH_RESPONSE_HELI_PARAMS') {
-        let params = event.data.params;
-        this._requestLayerUpdate('helicopters', params);
+                } else if (event.data.type === 'LH_RESPONSE_HELI_PARAMS') {
+                    let params = event.data.params;
+                    this._requestLayerUpdate('helicopters', params);
 
-    } else if (event.data.type === 'LH_RESPONSE_TRANSPORT_KEY') {
+                } else if (event.data.type === 'LH_RESPONSE_TRANSPORT_KEY') {
 
-        let sessionKey = 'lighthouseTransportApiKeyCache';
-        let transportApiKeyCache = event.data.key;
+                    let sessionKey = 'lighthouseTransportApiKeyCache';
+                    let transportApiKeyCache = event.data.key;
 
-        console.debug('got transport key: ' + transportApiKeyCache);
-        sessionStorage.setItem(sessionKey, transportApiKeyCache);
-        this._fetchTransportResourceWithKey(transportApiKeyCache, event.data.layer);
+                    console.debug('got transport key: ' + transportApiKeyCache);
+                    sessionStorage.setItem(sessionKey, transportApiKeyCache);
+                    this._fetchTransportResourceWithKey(transportApiKeyCache, event.data.layer);
+                }
+            }
+        }.bind(this), false);
     }
-}
-}.bind(this), false);
-}
 
     /**
      * Registers the click handler on the filter buttons.
@@ -181,7 +187,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
      * @param interval the refresh interval.
      * @return timer the timer which refreshes the layer.
      */
-     _registerClickHandler(buttonId, layer, updateFunction, interval) {
+    _registerClickHandler(buttonId, layer, updateFunction, interval) {
         document.getElementById(buttonId).addEventListener('click',
             function () {
                 console.debug(`toggle ${buttonId} clicked`);
@@ -207,7 +213,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
     /**
      * Sends a request to the background script to get the LHQ locations.
      */
-     _requestLhqsLayerUpdate() {
+    _requestLhqsLayerUpdate() {
         console.debug('updating LHQs layer');
         $.getJSON(chrome.extension.getURL('resources/SES_HQs.geojson'), function (data) {
             ContentScriptMapManager._passLayerDataToInject('lhqs', data);
@@ -217,7 +223,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
     /**
      * Sends a request to the background script to get the latest RFS incidents.
      */
-     _requestRfsLayerUpdate() {
+    _requestRfsLayerUpdate() {
         console.debug('updating RFS layer');
         this._requestLayerUpdate('rfs');
     }
@@ -225,7 +231,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
     /**
      * Sends a request to the background script to get the latest transport incidents.
      */
-     _requestTransportIncidentsLayerUpdate() {
+    _requestTransportIncidentsLayerUpdate() {
         console.debug('updating transport incidents layer');
         this._fetchTransportResource('transport-incidents');
     }
@@ -233,18 +239,25 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
     /**
      * Sends a request to the background script to get the latest transport flood reports.
      */
-     _requestTransportFloodReportsLayerUpdate() {
+    _requestTransportFloodReportsLayerUpdate() {
         console.debug('updating transport incidents layer');
         this._fetchTransportResource('transport-flood-reports');
     }
 
-
     /**
      * asks for the cameras via the fetchTransportResource function
      */
-     _requestTransportCamerasLayerUpdate() {
+    _requestTransportCamerasLayerUpdate() {
         console.debug('updating transport cameras layer');
         this._fetchTransportResource('transport-cameras');
+    }
+
+    /**
+     * Shows the BOM weather stations.
+     */
+    _showBomStationsLayer() {
+        console.debug('Showing BOM weather stations layer');
+        this._requestLayerUpdate('bom-weather-stations');
     }
 
     _requestPowerOutagesLayerUpdate() {
@@ -255,7 +268,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
     /**
      * Requests an update to the SES teams location layer.
      */
-     _requestSesTeamsLayerUpdate() {
+    _requestSesTeamsLayerUpdate() {
         console.debug('updating SES teams layer',this);
 
         if (!this._token) {
@@ -274,7 +287,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
      *
      * @param layer the layer to fetch, e.g. 'transport-incidents'.
      */
-     _fetchTransportResource(layer) {
+    _fetchTransportResource(layer) {
         let sessionKey = 'lighthouseTransportApiKeyCache';
         let transportApiKeyCache = sessionStorage.getItem(sessionKey);
 
@@ -294,7 +307,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
      * @param layer the layer to fetch.
      * @param apiKey the transport.nsw.gov.au API key.
      */
-     _fetchTransportResourceWithKey(apiKey, layer) {
+    _fetchTransportResourceWithKey(apiKey, layer) {
         console.info(`fetching transport resource: ${apiKey} ${layer}`);
         let params = {apiKey: apiKey};
         this._requestLayerUpdate(layer, params)
@@ -303,7 +316,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
     /**
      * Sends a request to the background script to get the latest helicopter positions.
      */
-     static _requestHelicoptersLayerUpdate() {
+    static _requestHelicoptersLayerUpdate() {
         console.debug('updating transport incidents layer');
         window.postMessage({type: 'LH_REQUEST_HELI_PARAMS'}, '*');
     }
@@ -315,7 +328,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
      * @param layer the layer to fetch.
      * @param params an API key or something needed to fetch the resource.
      */
-     _requestLayerUpdate(layer, params = {}) {
+    _requestLayerUpdate(layer, params = {}) {
         chrome.runtime.sendMessage({type: layer, params: params}, function (response) {
             if (response.error) {
                 console.error(`Update to ${type} failed: ${response.error} http-code:${response.httpCode}`);
@@ -331,7 +344,7 @@ const sesIcon = chrome.extension.getURL('icons/ses_corp.png');
      * @param layer the layer to own the data.
      * @param response the data to use.
      */
-     static _passLayerDataToInject(layer, response) {
+    static _passLayerDataToInject(layer, response) {
         window.postMessage({type: 'LH_UPDATE_LAYERS_DATA', layer: layer, response: response}, '*');
     }
 };

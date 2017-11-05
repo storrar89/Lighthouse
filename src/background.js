@@ -1,6 +1,7 @@
 // This background script is initialised and executed once and exists
 // separate to all other pages.
 
+const $ = require('jquery');
 const tj = require('togeojson');
 
 //Sit Aware Map Data Feeds
@@ -79,6 +80,11 @@ chrome.runtime.onMessage.addListener(
             return true;    
         } else if (request.type === 'helicopters') {
             fetchHelicopterLocations(request.params, function(data) {
+                sendResponse(data);
+            });
+            return true;
+        } else if (request.type === 'bom-weather-stations') {
+            fetchWeatherStations(function(data) {
                 sendResponse(data);
             });
             return true;
@@ -177,6 +183,70 @@ function loadSynchronously(url) {
     };
     xhttp.open('GET', openSkyFeed + params, true);
     xhttp.send();
+}
+
+/**
+ * Fetches the latest weather station readings.
+ *
+ * @param callback the callback to send the data to.
+ */
+ function fetchWeatherStations(callback) {
+    console.info('fetching weather station details');
+
+    $.getJSON(chrome.extension.getURL('resources/BOM_weather_stations.geojson'), function (stationList) {
+        var promises = [];
+
+        // Grab each station from our list and query the BOM for the latest details
+        stationList.features.forEach(function (station) {
+            var url = station.properties.feedUrl;
+
+            promises.push(new Promise(function (resolve) {
+                var xhr = new XMLHttpRequest();
+                xhr.open('GET', url, true);
+                xhr.onloadend = function () {
+                    if (this.readyState === 4 && this.status === 200) {
+                        var stationJson = JSON.parse(xhr.responseText);
+                        if (stationJson.observations && stationJson.observations.data) {
+                            var weatherData = stationJson.observations.data[0];
+                            station.properties.lastUpdate = weatherData.local_date_time_full;
+                            station.properties.apparentTemp = weatherData.apparent_t;
+                            station.properties.cloud = weatherData.cloud;
+                            station.properties.cloudBaseM = weatherData.cloud_base_m;
+                            station.properties.deltaTemp = weatherData.delta_t;
+                            station.properties.windGustKmh = weatherData.gust_kmh;
+                            station.properties.windGustKt = weatherData.gust_kt;
+                            station.properties.airTemp = weatherData.air_temp;
+                            station.properties.rainSince9am = weatherData.rain_trace;
+                            station.properties.windDirection = weatherData.wind_dir;
+                            station.properties.windSpeedKmh = weatherData.wind_spd_kmh;
+                            station.properties.windSpeedKt = weatherData.wind_spd_kt;
+                        }
+                    }
+
+                    resolve(station);
+                };
+                xhr.send();
+            }));
+        });
+
+        // Wait for all station data, then send the result back
+        Promise.all(promises).then(function(features) {
+            var geoJson = {
+                'type': 'FeatureCollection',
+                'features': []
+            };
+
+            // Collect all non-null features
+            features.forEach(function (feature) {
+                if (feature) {
+                    geoJson.features.push(feature);
+                }
+            });
+
+            console.debug('Found details for ' + geoJson.features.length + ' stations');
+            callback(geoJson);
+        });
+    });
 }
 
 /**

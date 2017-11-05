@@ -1,0 +1,41 @@
+{
+  "type": "FeatureCollection",
+  "features": [
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          150.79,
+          -34.56
+        ]
+      },
+      "properties": {
+        "title": "Albion Park",
+        "id": "068241",
+        "name": "WOLLONGONG AIRPORT",
+        "height": "8m",
+        "url": "http://www.bom.gov.au/products/IDN60801/IDN60801.95748.shtml",
+        "feedUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95748.json"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          150.93,
+          -34.37
+        ]
+      },
+      "properties": {
+        "title": "Bellambi",
+        "id": "068228",
+        "name": "BELLAMBI AWS",
+        "height": "10m",
+        "url": "http://www.bom.gov.au/products/IDN60801/IDN60801.94749.shtml",
+        "feedUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94749.json"
+      }
+    }
+  ]
+}
