@@ -14,7 +14,7 @@
         "title": "Albion Park",
         "id": "068241",
         "name": "WOLLONGONG AIRPORT",
-        "height": "8m",
+        "height": 8,
         "url": "http://www.bom.gov.au/products/IDN60801/IDN60801.95748.shtml",
         "feedUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95748.json"
       }
@@ -32,9 +32,81 @@
         "title": "Bellambi",
         "id": "068228",
         "name": "BELLAMBI AWS",
-        "height": "10m",
+        "height": 10,
         "url": "http://www.bom.gov.au/products/IDN60801/IDN60801.94749.shtml",
         "feedUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.94749.json"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          150.86,
+          -34.65
+        ]
+      },
+      "properties": {
+        "title": "Kiama",
+        "id": "068242",
+        "name": "KIAMA (BOMBO HEADLAND)",
+        "height": 15.5,
+        "url": "http://www.bom.gov.au/products/IDN60801/IDN60801.95749.shtml",
+        "feedUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95749.json"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          151.12,
+          -34.14
+        ]
+      },
+      "properties": {
+        "title": "Wattamolla",
+        "id": "066208",
+        "name": "WATTAMOLLA AWS",
+        "height": 44,
+        "url": "http://www.bom.gov.au/products/IDN60901/IDN60901.95752.shtml",
+        "feedUrl": "http://www.bom.gov.au/fwo/IDN60901/IDN60901.95752.json"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          150.86,
+          -34.65
+        ]
+      },
+      "properties": {
+        "title": "Kiama",
+        "id": "068242",
+        "name": "KIAMA (BOMBO HEADLAND)",
+        "height": 15.5,
+        "url": "http://www.bom.gov.au/products/IDN60801/IDN60801.95749.shtml",
+        "feedUrl": "http://www.bom.gov.au/fwo/IDN60801/IDN60801.95749.json"
+      }
+    },
+    {
+      "type": "Feature",
+      "geometry": {
+        "type": "Point",
+        "coordinates": [
+          149.20,
+          -35.31
+        ]
+      },
+      "properties": {
+        "title": "Canberra",
+        "id": "070351",
+        "name": "CANBERRA AIRPORT",
+        "height": 577.05,
+        "url": "http://www.bom.gov.au/products/IDN60903/IDN60903.94926.shtml",
+        "feedUrl": "http://www.bom.gov.au/fwo/IDN60903/IDN60903.94926.json"
       }
     }
   ]
